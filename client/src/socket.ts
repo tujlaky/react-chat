@@ -1,8 +1,6 @@
 import { io } from "socket.io-client";
 
-const URL = "http://localhost:3000";
-
-console.log("CREATE NEW SOCKET");
+const URL = "http://localhost:3001";
 
 export const socket = io(URL, {
   transports: ["websocket"],
