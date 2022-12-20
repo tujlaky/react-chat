@@ -3,25 +3,22 @@ import './App.css';
 import { sendMessage, socket } from './socket';
 import { Message } from '../../interfaces/message';
 import { useAxios } from './api/useAxios';
+import { useMessages } from './api/messages';
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]); // TODO: REFACTOR
+  const [messageBody, setMessageBody] = useState<string>('');
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-
-    const target = e.target as typeof e.target & {
-      messageBody: { value: string };
-    };
     
-    sendMessage(target.messageBody.value);
+    sendMessage(messageBody);
+    setMessageBody('');
   };
 
-  const { data: previousMessages }  = useAxios<Message[]>('http://localhost:3001/message')
+  const { data: previousMessages } = useMessages()
 
   useEffect(() => {
-
-
     socket.on('connect', () => {
       console.log('connected');
     });
@@ -47,15 +44,12 @@ function App() {
   return (
     <div className="App flex flex-col h-full">
       <ul className="bg-white flex-1">
-        {previousMessages?.map(message => (
-          <li key={message.id} className="text-left text-black">{message.body}</li>
-        ))}
-        {messages.map(message => (
-          <li key={message.id} className="text-left text-black">{message.body}</li>
+        {[...previousMessages, ...messages].map(message => (
+          <li key={message.id} className="text-left text-black"><b style={{color: message.user.color}}>{message.user.name}:</b> {message.body}</li>
         ))}
       </ul>
       <form onSubmit={handleSubmit} className="flex p-5 items-center">
-        <input name="messageBody" className="input input-bordered mr-5 w-full" type="text" />
+        <input value={messageBody} onChange={e => setMessageBody(e.target.value)} name="messageBody" className="input input-bordered mr-5 w-full" type="text" />
         <button className="btn btn-primary" type="submit">Send</button>
       </form>
     </div>
