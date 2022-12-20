@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { Message } from "../../interfaces/message";
 
 const io = new Server({
   cors: {
@@ -8,7 +9,17 @@ const io = new Server({
 });
 
 io.on("connection", (socket) => {
-  socket.emit("hi");
+  const message: Message = {
+    id: 1,
+    body: "Hello world!",
+    user: {
+      name: "Test",
+      color: "#FF0000",
+    },
+  };
+
+  socket.emit("message", message);
+
   console.log("a user connected");
 });
 
